@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Neti Checker</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_participant_list">ParticipantList</string>
+</resources>
