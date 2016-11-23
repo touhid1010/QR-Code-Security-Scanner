@@ -12,6 +12,7 @@ public class DataEntity {
     private String eventID;
     private String eventName;
     private String participateID;
+    private String participateType;
     private String name;
     private String phone;
     private String area;
@@ -21,20 +22,22 @@ public class DataEntity {
 
     }
 
-    public DataEntity(String eventID, String eventName, String participateID, String name, String phone, String area) {
+    public DataEntity(String eventID, String eventName, String participateID, String participateType, String name, String phone, String area) {
         this.eventID = eventID;
         this.eventName = eventName;
         this.participateID = participateID;
+        this.participateType = participateType;
         this.name = name;
         this.phone = phone;
         this.area = area;
     }
 
-    public DataEntity(String tableColumnId, String eventID, String eventName, String participateID, String name, String phone, String area, Date dateTime) {
+    public DataEntity(String tableColumnId, String eventID, String eventName, String participateID, String participateType, String name, String phone, String area, Date dateTime) {
         this.tableColumnId = tableColumnId;
         this.eventID = eventID;
         this.eventName = eventName;
         this.participateID = participateID;
+        this.participateType = participateType;
         this.name = name;
         this.phone = phone;
         this.area = area;
@@ -67,6 +70,14 @@ public class DataEntity {
 
     public String getParticipateID() {
         return participateID;
+    }
+
+    public String getParticipateType() {
+        return participateType;
+    }
+
+    public void setParticipateType(String participateType) {
+        this.participateType = participateType;
     }
 
     public void setParticipateID(String participateID) {
@@ -104,4 +115,5 @@ public class DataEntity {
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
     }
+
 }

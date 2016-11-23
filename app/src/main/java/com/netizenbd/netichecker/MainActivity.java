@@ -1,14 +1,10 @@
 package com.netizenbd.netichecker;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
@@ -46,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     BarcodeDetector barcodeDetector;
     CameraSource cameraSource;
-    String qrData = "";
+    String tempQrData = "";
+    MySendSMS mySendSMS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            }
 //        }
 
+
+        // sms
+        mySendSMS = new MySendSMS(this);
+
         cameraView = (SurfaceView) findViewById(R.id.camera_view);
         textView_showInfo = (TextView) findViewById(R.id.code_info);
         button_submit = (Button) findViewById(R.id.button_list);
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         cameraSource = new CameraSource
                 .Builder(this, barcodeDetector)
-                .setRequestedPreviewSize(480, 600)
+                .setRequestedPreviewSize(400, 400)
                 .build();
 
         cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
@@ -140,19 +141,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             /**
                              * If same data get again, then compare and use one time
                              */
-                            if (qrData.equals(sQrData)) {
+                            if (tempQrData.equals(sQrData)) {
                                 // This part will run again and again while reading same qr
 
                             } else {
                                 // This part will run one time while reading same qr
 
                                 String allData = "";
+                                String pName = "";
+                                String pPhone = "";
                                 try {
                                     JSONObject json = null;
                                     json = new JSONObject(sQrData);
 
-                                    allData = "Event:  " + json.getString("eventname") + "\n" + "Name: " + json.getString("name") +
-                                            "\nArea:    " + json.getString("area") + "\nPhone: " + json.getString("phone");
+                                    pName = json.getString("name");
+                                    pPhone = json.getString("phone");
+
+                                    allData = "Event:  " + json.getString("eventname") + "\n" + "Name: " + pName + " (" + json.getString("participanttype") + ")" +
+                                            "\nArea:    " + json.getString("area") + "\nPhone: " + pPhone;
 
                                 } catch (JSONException e) {
                                     allData = sQrData;
@@ -162,10 +168,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 //                                textView_showInfo.setText(barcodes.valueAt(0).displayValue); // Update the TextView
                                 textView_showInfo.setText(allData); // Update the TextView
-                                saveToSqlite(barcodes.valueAt(0).displayValue); // Save to db
+                                saveToSqlite(sQrData); // Save to db
+
+
                             }
                             // Keep qr data in a string to check data are same or not
-                            qrData = barcodes.valueAt(0).displayValue;
+                            tempQrData = barcodes.valueAt(0).displayValue;
                         }
                     });
                 }
@@ -207,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.button_reset:
                 // reset qr check value and set default text
-                qrData = "";
+                tempQrData = "";
                 textView_showInfo.setText("Reading QR ...");
                 break;
         }
@@ -219,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String eventID = "";
         String eventName = "";
         String participantID = "";
+        String participateType = "";
         String participantName = "";
         String participantPhone = "";
         String participantArea = "";
@@ -232,6 +241,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         System.out.println("touhiddd: " + dateTime);
 
 
+        String pName = "";
+        String pPhone = "";
+
         try {
 
             JSONObject json = null;
@@ -239,14 +251,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             eventID = json.getString("eventid");
             eventName = json.getString("eventname");
             participantID = json.getString("participantid");
+            participateType = json.getString("participanttype");
             participantName = json.getString("name");
             participantPhone = json.getString("phone");
             participantArea = json.getString("area");
+
+            pName = json.getString("name");
+            pPhone = json.getString("phone");
 
             dataService = new DataService(MainActivity.this).insertData(MainActivity.this, new DataEntity(
                     eventID,
                     eventName,
                     participantID,
+                    participateType,
                     participantName,
                     participantPhone,
                     participantArea
@@ -259,6 +276,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (dataService) {
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+
+            /**
+             * Send sms if successfully save data
+             */
+            String smsBody = "Hello " + pName + ". Welcome to Netizen IT Limited.";
+            mySendSMS.sendMySMS(pPhone, smsBody);
+
         } else {
             Toast.makeText(this, "Not Saved", Toast.LENGTH_SHORT).show();
         }

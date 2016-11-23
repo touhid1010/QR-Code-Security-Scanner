@@ -18,6 +18,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
             COLUMN_DATA_EVENT_ID = "event_id",
             COLUMN_DATA_EVENT_NAME = "event_name",
             COLUMN_DATA_PARTICIPANT_ID = "participant_id",
+            COLUMN_DATA_PARTICIPANT_TYPE = "type", // guest or visitor or others
             COLUMN_DATA_PARTICIPANT_NAME = "name",
             COLUMN_DATA_PARTICIPANT_PHONE = "phone",
             COLUMN_DATA_PARTICIPANT_AREA = "area",
@@ -28,6 +29,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
             COLUMN_DATA_EVENT_ID + " TEXT, " +
             COLUMN_DATA_EVENT_NAME + " TEXT, " +
             COLUMN_DATA_PARTICIPANT_ID + " TEXT, " +
+            COLUMN_DATA_PARTICIPANT_TYPE + " TEXT, " +
             COLUMN_DATA_PARTICIPANT_NAME + " TEXT, " +
             COLUMN_DATA_PARTICIPANT_PHONE + " TEXT, " +
             COLUMN_DATA_PARTICIPANT_AREA + " TEXT, " +

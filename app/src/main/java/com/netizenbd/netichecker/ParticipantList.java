@@ -30,6 +30,7 @@ public class ParticipantList extends AppCompatActivity implements SearchView.OnQ
     MyAdapter myAdapter;
     List<DataEntity> dataEntityList;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +50,7 @@ public class ParticipantList extends AppCompatActivity implements SearchView.OnQ
         } else {
             textView_amount.setText("No Participant");
         }
+
 
         /**
          * Recycler view
@@ -130,9 +132,10 @@ public class ParticipantList extends AppCompatActivity implements SearchView.OnQ
         final List<DataEntity> filteredModelList = new ArrayList<>();
         for (DataEntity model : dataEntities) {
             final String name = model.getName().toLowerCase(); // to search by name
+            final String type = model.getParticipateType().toLowerCase(); // to search by type
             final String phone = model.getPhone().toLowerCase(); // to search by phone
             final String area = model.getArea().toLowerCase(); // to search by area
-            if (name.contains(query) || phone.contains(query) || area.contains(query)) {
+            if (name.contains(query) || type.contains(query) || phone.contains(query) || area.contains(query)) {
                 filteredModelList.add(model);
             }
         }

@@ -48,6 +48,7 @@ public class DataService {
             values.put(MyDbHelper.COLUMN_DATA_EVENT_ID, dataEntity.getEventID());
             values.put(MyDbHelper.COLUMN_DATA_EVENT_NAME, dataEntity.getEventName());
             values.put(MyDbHelper.COLUMN_DATA_PARTICIPANT_ID, dataEntity.getParticipateID());
+            values.put(MyDbHelper.COLUMN_DATA_PARTICIPANT_TYPE, dataEntity.getParticipateType());
             values.put(MyDbHelper.COLUMN_DATA_PARTICIPANT_NAME, dataEntity.getName());
             values.put(MyDbHelper.COLUMN_DATA_PARTICIPANT_PHONE, dataEntity.getPhone());
             values.put(MyDbHelper.COLUMN_DATA_PARTICIPANT_AREA, dataEntity.getArea());
@@ -91,7 +92,8 @@ public class DataService {
         if (cursor.moveToFirst()) {
             Date convertedDate = null;
             try {
-                convertedDate = new SimpleDateFormat().parse(cursor.getString(7));
+                convertedDate = new SimpleDateFormat().parse(cursor.getString(8)); // here, date in 8 no column index in db
+                Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -99,13 +101,14 @@ public class DataService {
             do {
                 dataEntityList.add(new DataEntity(
                         cursor.getString(0), // Column id
-                        cursor.getString(1),
-                        cursor.getString(2),
-                        cursor.getString(3),
-                        cursor.getString(4),
-                        cursor.getString(5),
-                        cursor.getString(6),
-                        convertedDate
+                        cursor.getString(1), // event id
+                        cursor.getString(2), // event name
+                        cursor.getString(3), // participant id
+                        cursor.getString(4), // participant type
+                        cursor.getString(5), // participant name
+                        cursor.getString(6), // participant phone
+                        cursor.getString(7), // participant area
+                        convertedDate        // checking date/time
                 ));
 
             } while (cursor.moveToNext());
@@ -118,8 +121,6 @@ public class DataService {
         // Returning labels
         return dataEntityList;
     }
-
-
 
 
 }

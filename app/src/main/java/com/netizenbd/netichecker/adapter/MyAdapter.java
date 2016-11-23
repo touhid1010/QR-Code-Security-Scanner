@@ -45,8 +45,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
         DataEntity dataEntity = dataEntityList.get(position);
         holder.textView_name.setText(dataEntity.getName());
         holder.textView_participantID.setText(dataEntity.getParticipateID());
+        holder.textView_participantType.setText(dataEntity.getParticipateType());
         holder.textView_phone.setText(dataEntity.getPhone());
         holder.textView_area.setText(dataEntity.getArea());
+        holder.textView_checkingTime.setText("" + dataEntity.getDateTime());
 
 
         // on Click listener
@@ -67,19 +69,23 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
 
         TextView textView_name,
                 textView_participantID,
+                textView_participantType,
                 textView_phone,
-                textView_area;
+                textView_area,
+                textView_checkingTime;
 
         ImageView personPhoto;
 
         ParticipantViewHolder(View itemView) {
             super(itemView);
-            cardView_list = (CardView)itemView.findViewById(R.id.cardView_list);
+            cardView_list = (CardView) itemView.findViewById(R.id.cardView_list);
 
-            textView_name = (TextView)itemView.findViewById(R.id.textView_name);
-            textView_participantID = (TextView)itemView.findViewById(R.id.textView_participantID);
-            textView_phone = (TextView)itemView.findViewById(R.id.textView_phone);
-            textView_area = (TextView)itemView.findViewById(R.id.textView_area);
+            textView_name = (TextView) itemView.findViewById(R.id.textView_name);
+            textView_participantID = (TextView) itemView.findViewById(R.id.textView_participantID);
+            textView_participantType = (TextView) itemView.findViewById(R.id.textView_participantType);
+            textView_phone = (TextView) itemView.findViewById(R.id.textView_phone);
+            textView_area = (TextView) itemView.findViewById(R.id.textView_area);
+            textView_checkingTime = (TextView) itemView.findViewById(R.id.textView_checkingTime);
 
 //            personPhoto = (ImageView)itemView.findViewById(R.id.person_photo);
 
@@ -93,7 +99,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
     public void setFilter(List<DataEntity> dataEntities) {
         dataEntityList = new ArrayList<>();
         dataEntityList.addAll(dataEntities);
-        Log.d("ttt", "setFilter: "+dataEntities.size());
+        Log.d("ttt", "setFilter: " + dataEntities.size());
         notifyDataSetChanged();
     }
 }
