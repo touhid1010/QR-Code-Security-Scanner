@@ -44,21 +44,6 @@
                 android:text="Reading QR ..."
                 android:textSize="20sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/button_list"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Participant List"
-                    android:textColor="#363636" />
-
-            </LinearLayout>
-
             <CheckBox
                 android:id="@+id/checkbox_sms"
                 android:layout_width="wrap_content"

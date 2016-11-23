@@ -15,21 +15,16 @@ import android.widget.Toast;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -51,7 +46,6 @@ public class MainActivity extends AppCompatActivity
 
     SurfaceView cameraView;
     TextView textView_showInfo;
-    Button button_submit;
     MyDbHelper myDbHelper;
     DataService dataService;
 
@@ -106,9 +100,7 @@ public class MainActivity extends AppCompatActivity
 
         cameraView = (SurfaceView) findViewById(R.id.camera_view);
         textView_showInfo = (TextView) findViewById(R.id.code_info);
-        button_submit = (Button) findViewById(R.id.button_list);
 
-        button_submit.setOnClickListener(this);
 
         barcodeDetector =
                 new BarcodeDetector.Builder(this)
@@ -252,18 +244,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_home) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_participant_list) {
+            startActivity(new Intent(this, ParticipantList.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -281,9 +265,6 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(this, "Reset", Toast.LENGTH_SHORT).show();
                 break;
 
-            case R.id.button_list:
-                startActivity(new Intent(getApplicationContext(), ParticipantList.class));
-                break;
 
 
         }
