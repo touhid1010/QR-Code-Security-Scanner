@@ -129,8 +129,10 @@ public class ParticipantList extends AppCompatActivity implements SearchView.OnQ
         query = query.toLowerCase();
         final List<DataEntity> filteredModelList = new ArrayList<>();
         for (DataEntity model : dataEntities) {
-            final String text = model.getName().toLowerCase();
-            if (text.contains(query)) {
+            final String name = model.getName().toLowerCase(); // to search by name
+            final String phone = model.getPhone().toLowerCase(); // to search by phone
+            final String area = model.getArea().toLowerCase(); // to search by area
+            if (name.contains(query) || phone.contains(query) || area.contains(query)) {
                 filteredModelList.add(model);
             }
         }
