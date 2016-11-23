@@ -1,10 +1,14 @@
 package com.netizenbd.netichecker;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView textView_showInfo;
     Button button_submit, button_eventManage;
     MyDbHelper myDbHelper;
+    DataService dataService;
 
     BarcodeDetector barcodeDetector;
     CameraSource cameraSource;
@@ -73,8 +78,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_submit.setOnClickListener(this);
         button_eventManage.setOnClickListener(this);
 
-        myDbHelper = new MyDbHelper(this);
-
         barcodeDetector =
                 new BarcodeDetector.Builder(this)
                         .setBarcodeFormats(Barcode.QR_CODE)
@@ -82,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         cameraSource = new CameraSource
                 .Builder(this, barcodeDetector)
-                .setRequestedPreviewSize(400, 400)
+                .setRequestedPreviewSize(480, 600)
                 .build();
 
         cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
@@ -121,7 +124,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void release() {
 
             }
-
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
@@ -177,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -188,9 +191,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -240,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             participantPhone = json.getString("phone");
             participantArea = json.getString("area");
 
-            dataService = new DataService().insertData(MainActivity.this, new DataEntity(
+            dataService = new DataService(MainActivity.this).insertData(MainActivity.this, new DataEntity(
                     eventID,
                     eventName,
                     participantID,

@@ -17,6 +17,10 @@ public class DataEntity {
     private String area;
     private Date dateTime;
 
+    public DataEntity() {
+
+    }
+
     public DataEntity(String eventID, String eventName, String participateID, String name, String phone, String area) {
         this.eventID = eventID;
         this.eventName = eventName;

@@ -29,6 +29,11 @@ public class DataService {
 
     private long insert;
 
+    private Context context;
+
+    public DataService(Context context) {
+        this.context = context;
+    }
 
     public boolean insertData(Context context, DataEntity dataEntity) {
         try {
@@ -113,4 +118,8 @@ public class DataService {
         // Returning labels
         return dataEntityList;
     }
+
+
+
+
 }
