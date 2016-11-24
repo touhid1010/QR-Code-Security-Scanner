@@ -1,6 +1,10 @@
 package com.netizenbd.netichecker;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
@@ -25,11 +29,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -47,6 +48,8 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, SMS.OnFragmentInteractionListener {
 
@@ -61,10 +64,13 @@ public class MainActivity extends AppCompatActivity
     CameraSource cameraSource;
     String tempQrData = "";
     MySendSMS mySendSMS;
-    CheckBox checkbox_sms;
     FrameLayout frameLayout_forFragment;
     FragmentManager manager;
     FragmentTransaction transaction;
+    SharedPreferences preferences;
+    String smsText;
+    boolean checkbox_sms;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,31 +100,19 @@ public class MainActivity extends AppCompatActivity
         // Fragment
         manager = getSupportFragmentManager();
 
-
-        /**
-         * Permission for marshmallow
-         */
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            createPermissions();
-//        }
-//        public void createPermissions(){
-//            String permission = Manifest.permission.READ_SMS;
-//            if (ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED){
-//                if(!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)){
-//                    requestPermissions(new String[]{permission}),
-//                            SMS_PERMISSION);
-//                }
-//            }
-//        }
+        // Shared pref
+        preferences = getSharedPreferences(SMS.PREFERENCE_NAME_SMS, Context.MODE_PRIVATE);
+        if (preferences != null) {
+            smsText = preferences.getString(SMS.PREFERENCE_SMS_KEY_SMS_TEXT, "");
+            checkbox_sms = preferences.getBoolean(SMS.PREFERENCE_SMS_KEY_CHECKBOX, false);
+        }
 
 
         // sms
         mySendSMS = new MySendSMS(this);
-        checkbox_sms = (CheckBox) findViewById(R.id.checkbox_sms);
 
         cameraView = (SurfaceView) findViewById(R.id.camera_view);
         textView_showInfo = (TextView) findViewById(R.id.code_info);
-
 
         barcodeDetector =
                 new BarcodeDetector.Builder(this)
@@ -142,6 +136,8 @@ public class MainActivity extends AppCompatActivity
                         //  int[] grantResults)
                         // to handle the case where the user grants the permission. See the documentation
                         // for ActivityCompat#requestPermissions for more details.
+
+
                         return;
                     }
                     cameraSource.start(cameraView.getHolder());
@@ -231,6 +227,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+
     }
 
     @Override
@@ -268,7 +265,9 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, ParticipantList.class));
         } else if (id == R.id.nav_sms) {
             transaction = manager.beginTransaction();
-            transaction.replace(R.id.frameLayout_forFragment, new SMS()).commit();
+            transaction.replace(R.id.frameLayout_forFragment, new SMS());
+            transaction.addToBackStack(null);
+            transaction.commit();
             fab_reset.setVisibility(View.GONE);
         }
 
@@ -355,8 +354,8 @@ public class MainActivity extends AppCompatActivity
             /**
              * Send sms if successfully save data
              */
-            if (checkbox_sms.isChecked()) {
-                String smsBody = "Hello " + pName + ". Thank you for participating. -- Netizen IT Limited.";
+            if (checkbox_sms) {
+                String smsBody = "Dear " + pName + ", " + smsText + " -- Netizen IT Limited.";
                 mySendSMS.sendMySMS(pPhone, smsBody);
             }
 
@@ -366,9 +365,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
     @Override
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+
+
+
 }

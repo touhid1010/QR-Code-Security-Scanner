@@ -16,37 +16,59 @@
             android:layout_height="wrap_content"
             android:layout_margin="15dp">
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_password"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp">
+                android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/editText_"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:gravity="top"
-                    android:hint="SMS Text"
-                    android:lines="4" />
+                    android:text="Dear Touhid," />
 
-            </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/input_layout_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp">
+
+                    <EditText
+                        android:id="@+id/editText_SMSText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:gravity="top"
+                        android:hint="SMS Text"
+                        android:lines="4"
+                        android:maxLength="100" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:text="-- Netizen IT Limited." />
+
+            </LinearLayout>
+
 
         </android.support.v7.widget.CardView>
 
         <CheckBox
+            android:id="@+id/checkbox_sendSMS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:checked="true"
+            android:checked="false"
             android:text="Send SMS" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="If checked SMS will be send after scanning QR" />
+            android:gravity="center"
+            android:text="If checked SMS will be send automatically\n after scanning QR" />
 
         <Button
             android:id="@+id/button_smsSave"
