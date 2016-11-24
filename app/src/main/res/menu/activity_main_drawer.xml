@@ -2,15 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_menu_home"
             android:title="Home" />
+
         <item
             android:id="@+id/nav_participant_list"
             android:icon="@drawable/ic_menu_list"
             android:title="Participant List" />
 
+        <item
+            android:id="@+id/nav_sms"
+            android:icon="@drawable/ic_menu_sms"
+            android:title="SMS Settings" />
 
     </group>
 

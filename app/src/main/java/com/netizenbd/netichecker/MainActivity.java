@@ -1,7 +1,11 @@
 package com.netizenbd.netichecker;
 
+import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import android.content.Intent;
@@ -29,6 +34,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.netizenbd.netichecker.fragments.SMS;
 import com.netizenbd.netichecker.sqlitedatabase.DataEntity;
 import com.netizenbd.netichecker.sqlitedatabase.DataService;
 import com.netizenbd.netichecker.sqlitedatabase.MyDbHelper;
@@ -42,7 +48,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, SMS.OnFragmentInteractionListener {
 
     SurfaceView cameraView;
     TextView textView_showInfo;
@@ -54,6 +60,9 @@ public class MainActivity extends AppCompatActivity
     String tempQrData = "";
     MySendSMS mySendSMS;
     CheckBox checkbox_sms;
+    FrameLayout frameLayout_forFragment;
+    FragmentManager manager;
+    FragmentTransaction transaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +85,14 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // initialization
+        frameLayout_forFragment = (FrameLayout) findViewById(R.id.frameLayout_forFragment);
+
+        // Fragment
+        manager = getSupportFragmentManager();
+
+
 
         /**
          * Permission for marshmallow
@@ -203,7 +220,6 @@ public class MainActivity extends AppCompatActivity
         });
 
 
-
     } // end of onCreate
 
     @Override
@@ -245,9 +261,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-
+              frameLayout_forFragment.removeAllViews();
         } else if (id == R.id.nav_participant_list) {
             startActivity(new Intent(this, ParticipantList.class));
+        } else if (id == R.id.nav_sms) {
+            transaction = manager.beginTransaction();
+            transaction.replace(R.id.frameLayout_forFragment, new SMS()).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -266,12 +285,12 @@ public class MainActivity extends AppCompatActivity
                 break;
 
 
-
         }
     }
 
     /**
      * Save method to save sqlite db
+     *
      * @param qrData
      */
     private void saveToSqlite(String qrData) {
@@ -341,6 +360,12 @@ public class MainActivity extends AppCompatActivity
         } else {
             Toast.makeText(this, "Not Saved", Toast.LENGTH_SHORT).show();
         }
+
+    }
+
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
     }
 }
