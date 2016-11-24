@@ -52,8 +52,10 @@ public class MainActivity extends AppCompatActivity
 
     SurfaceView cameraView;
     TextView textView_showInfo;
+    FloatingActionButton fab_reset;
     MyDbHelper myDbHelper;
     DataService dataService;
+
 
     BarcodeDetector barcodeDetector;
     CameraSource cameraSource;
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setTitle("Neti QR Checker");
 
         // fab
-        FloatingActionButton fab_reset = (FloatingActionButton) findViewById(R.id.fab_reset);
+        fab_reset = (FloatingActionButton) findViewById(R.id.fab_reset);
         fab_reset.setOnClickListener(this);
 
         // drawer
@@ -91,7 +93,6 @@ public class MainActivity extends AppCompatActivity
 
         // Fragment
         manager = getSupportFragmentManager();
-
 
 
         /**
@@ -261,12 +262,14 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-              frameLayout_forFragment.removeAllViews();
+            frameLayout_forFragment.removeAllViews();
+            fab_reset.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_participant_list) {
             startActivity(new Intent(this, ParticipantList.class));
         } else if (id == R.id.nav_sms) {
             transaction = manager.beginTransaction();
             transaction.replace(R.id.frameLayout_forFragment, new SMS()).commit();
+            fab_reset.setVisibility(View.GONE);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
