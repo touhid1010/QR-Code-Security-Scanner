@@ -74,14 +74,14 @@ public class DataService {
         }
     }
 
-    public List<DataEntity> getDataEntityList(Context context) {
+    public List<DataEntity> getDataEntityList() {
 
         List<DataEntity> dataEntityList = new ArrayList<DataEntity>();
 
         myDbHelper = new MyDbHelper(context);
         Log.d("touhidd", "dataEntityList: 2");
         // Open db as readable mode
-        sqLiteDatabase = myDbHelper.getWritableDatabase();
+        sqLiteDatabase = myDbHelper.getReadableDatabase();
         Log.d("touhidd", "dataEntityList: 11");
 
         // Select All Query

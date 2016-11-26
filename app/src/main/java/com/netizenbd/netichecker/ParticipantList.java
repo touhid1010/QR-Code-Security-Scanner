@@ -1,7 +1,7 @@
 package com.netizenbd.netichecker;
 
-import android.app.ActionBar;
-import android.content.Intent;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.netizenbd.netichecker.adapter.MyAdapter;
 import com.netizenbd.netichecker.sqlitedatabase.DataEntity;
@@ -29,7 +30,7 @@ public class ParticipantList extends AppCompatActivity implements SearchView.OnQ
     CardView cardView_list;
     MyAdapter myAdapter;
     List<DataEntity> dataEntityList;
-
+    DataService dataService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +42,9 @@ public class ParticipantList extends AppCompatActivity implements SearchView.OnQ
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Participant List");
 
-        textView_amount = (TextView) findViewById(R.id.textView_amount);
+//        textView_amount = (TextView) findViewById(R.id.textView_amount);
 
-        DataService dataService = new DataService(this);
-        dataEntityList = dataService.getDataEntityList(this);
-        if (dataEntityList.size() > 0) {
-            textView_amount.setText("Total Participant: " + dataEntityList.size());
-        } else {
-            textView_amount.setText("No Participant");
-        }
-
+        getAndShowParticipantAmount(this);
 
         /**
          * Recycler view
@@ -63,6 +57,7 @@ public class ParticipantList extends AppCompatActivity implements SearchView.OnQ
 
         // Layout manager for Recycler view
         recyclerView_participant_list.setLayoutManager(new LinearLayoutManager(this));
+
 
     } // end of onCreate
 
@@ -140,6 +135,35 @@ public class ParticipantList extends AppCompatActivity implements SearchView.OnQ
             }
         }
         return filteredModelList;
+    }
+
+
+    /**
+     * Important method
+     * This method with a run thread to run on ui thread
+     * this is called from onCreate to get list and MyAdapter to refresh list after delete
+     * Thread used to manage error of setText() method
+     *
+     * @param activity
+     */
+    public void getAndShowParticipantAmount(final Activity activity) {
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textView_amount = (TextView) activity.findViewById(R.id.textView_amount);
+                dataService = new DataService(activity);
+                dataEntityList = dataService.getDataEntityList();
+                int size = dataEntityList.size();
+                if (size > 0) {
+                    textView_amount.setText("Total Participant: " + size);
+                } else {
+                    textView_amount.setText("No Participant");
+                }
+            }
+        });
+
+
     }
 
 }

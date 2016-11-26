@@ -136,12 +136,11 @@ public class MainActivity extends AppCompatActivity
                         // to handle the case where the user grants the permission. See the documentation
                         // for ActivityCompat#requestPermissions for more details.
 
-
                         return;
                     }
                     cameraSource.start(cameraView.getHolder());
                 } catch (IOException ie) {
-                    Log.e("CAMERA SOURCE", ie.getMessage());
+                    Log.e("CAMERA SOURCE ", ie.getMessage());
                 }
             }
 
@@ -171,7 +170,7 @@ public class MainActivity extends AppCompatActivity
                     textView_showInfo.post(new Runnable() { // Use the post method of the TextView; receiveDetections does not run on the UI thread
                         public void run() {
 
-                            // get qr data
+                            // Get qr data
                             String sQrData = barcodes.valueAt(0).displayValue;
 
                             /**
@@ -368,8 +367,6 @@ public class MainActivity extends AppCompatActivity
     public void onFragmentInteraction(Uri uri) {
 
     }
-
-
 
 
 }

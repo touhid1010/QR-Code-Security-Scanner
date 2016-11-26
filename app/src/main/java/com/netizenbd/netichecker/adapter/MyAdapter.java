@@ -1,7 +1,7 @@
 package com.netizenbd.netichecker.adapter;
 
+import android.app.Activity;
 import android.content.Context;
-import android.provider.ContactsContract;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,10 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.netizenbd.netichecker.CommonNames;
+import com.netizenbd.netichecker.ParticipantList;
 import com.netizenbd.netichecker.R;
 import com.netizenbd.netichecker.sqlitedatabase.DataEntity;
 import com.netizenbd.netichecker.sqlitedatabase.DataService;
@@ -46,7 +47,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
     }
 
     @Override
-    public void onBindViewHolder(ParticipantViewHolder holder, int position) {
+    public void onBindViewHolder(final ParticipantViewHolder holder, int position) {
         DataEntity dataEntity = dataEntityList.get(position);
         holder.textView_name.setText(dataEntity.getName());
         holder.textView_participantID.setText(dataEntity.getParticipateID());
@@ -55,12 +56,46 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
         holder.textView_area.setText(dataEntity.getArea());
         holder.textView_checkingTime.setText("" + dataEntity.getDateTime());
 
-        // set tag for delete action
+        // Set tag for delete action
         holder.textView_name.setTag(dataEntity.getTableColumnId()); // To delete by column id
 
 
         // on Click listener
-//        holder.cardView_list
+        holder.imageButton_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                /**
+                 * Delete item from db
+                 */
+                DataService dataService = new DataService(view.getContext());
+                long deleteStatus = dataService.deleteParticipantData(holder.textView_name.getTag().toString());
+                if (deleteStatus > 0) {
+                    Toast.makeText(view.getContext(), "Delete Success", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(view.getContext(), "Not Deleted", Toast.LENGTH_SHORT).show();
+                }
+
+                /**
+                 * Remove item from list after delete from db
+                 */
+                int newPosition = holder.getAdapterPosition();
+                Log.d("touhid","on Click onBindViewHolder");
+                dataEntityList.remove(newPosition);
+                notifyItemRemoved(newPosition);
+                notifyItemRangeChanged(newPosition, dataEntityList.size());
+
+                /**
+                 * Change Total participant after delete item
+                 */
+                ParticipantList participantList = new ParticipantList();
+                participantList.getAndShowParticipantAmount((Activity) context);
+
+
+            }
+        });
+
+
     }
 
     @Override
@@ -84,7 +119,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
 
         ImageButton imageButton_delete;
 
-        ParticipantViewHolder(View itemView) {
+        ParticipantViewHolder(final View itemView) {
             super(itemView);
             cardView_list = (CardView) itemView.findViewById(R.id.cardView_list);
 
@@ -96,27 +131,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
             textView_checkingTime = (TextView) itemView.findViewById(R.id.textView_checkingTime);
 
             imageButton_delete = (ImageButton) itemView.findViewById(R.id.imageButton_delete);
-            imageButton_delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    switch (view.getId()) {
-                        case R.id.imageButton_delete:
-                            DataService dataService = new DataService(view.getContext());
-                            long deleteStatus = dataService.deleteParticipantData(textView_name.getTag().toString());
-                            if (deleteStatus > 0) {
-                                Toast.makeText(view.getContext(), "Delete Success", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(view.getContext(), "Not Deleted", Toast.LENGTH_SHORT).show();
-                            }
-                            break;
-                    }
-                }
-            });
 
 //            personPhoto = (ImageView)itemView.findViewById(R.id.person_photo);
 
         }
-
 
     }
 
@@ -129,5 +147,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
         dataEntityList.addAll(dataEntities);
         Log.d("ttt", "setFilter: " + dataEntities.size());
         notifyDataSetChanged();
+
     }
+
+
+
 }
