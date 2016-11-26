@@ -31,8 +31,10 @@ public class DataService {
 
     private Context context;
 
+
     public DataService(Context context) {
         this.context = context;
+        myDbHelper = new MyDbHelper(context); // always it needs so better to keep it on constructor
     }
 
     public boolean insertData(Context context, DataEntity dataEntity) {
@@ -82,7 +84,6 @@ public class DataService {
         sqLiteDatabase = myDbHelper.getWritableDatabase();
         Log.d("touhidd", "dataEntityList: 11");
 
-
         // Select All Query
         String selectQuery = "SELECT * FROM " + MyDbHelper.TABLE_DATA + " ORDER BY " + MyDbHelper.COLUMN_ID + " DESC";
         Cursor cursor = sqLiteDatabase.rawQuery(selectQuery, null);
@@ -122,5 +123,16 @@ public class DataService {
         return dataEntityList;
     }
 
+    public long deleteParticipantData(String taggedID) {
+
+        sqLiteDatabase = myDbHelper.getWritableDatabase(); // Open db as writable mode
+
+        String[] convert = {taggedID};
+        //  Inserting Row
+        long delete = sqLiteDatabase.delete(MyDbHelper.TABLE_DATA, MyDbHelper.COLUMN_ID + " LIKE ?", convert);
+        sqLiteDatabase.close();
+
+        return delete;
+    }
 
 }

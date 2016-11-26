@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity
     MyDbHelper myDbHelper;
     DataService dataService;
 
-
     BarcodeDetector barcodeDetector;
     CameraSource cameraSource;
     String tempQrData = "";
