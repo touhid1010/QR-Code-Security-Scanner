@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.netizenbd.netichecker.ParticipantList;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -93,8 +94,7 @@ public class DataService {
         if (cursor.moveToFirst()) {
             Date convertedDate = null;
             try {
-                convertedDate = new SimpleDateFormat().parse(cursor.getString(8)); // here, date in 8 no column index in db
-                Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
+                convertedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cursor.getString(8)); // here, date in 8 no column index in db
             } catch (ParseException e) {
                 e.printStackTrace();
             }

@@ -20,6 +20,7 @@ import com.netizenbd.netichecker.R;
 import com.netizenbd.netichecker.sqlitedatabase.DataEntity;
 import com.netizenbd.netichecker.sqlitedatabase.DataService;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
         holder.textView_participantType.setText(dataEntity.getParticipateType());
         holder.textView_phone.setText(dataEntity.getPhone());
         holder.textView_area.setText(dataEntity.getArea());
-        holder.textView_checkingTime.setText("" + dataEntity.getDateTime());
+
+        // date set with format
+        SimpleDateFormat dt1 = new SimpleDateFormat("dd/MM/yyyy : hh:mm");
+        holder.textView_checkingTime.setText("" + dt1.format(dataEntity.getDateTime()));
 
         // Set tag for delete action
         holder.textView_name.setTag(dataEntity.getTableColumnId()); // To delete by column id
