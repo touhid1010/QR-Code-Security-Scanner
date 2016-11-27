@@ -2,6 +2,8 @@ package com.netizenbd.netichecker.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -63,33 +65,46 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
         // on Click listener
         holder.imageButton_delete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
 
-                /**
-                 * Delete item from db
-                 */
-                DataService dataService = new DataService(view.getContext());
-                long deleteStatus = dataService.deleteParticipantData(holder.textView_name.getTag().toString());
-                if (deleteStatus > 0) {
-                    Toast.makeText(view.getContext(), "Delete Success", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(view.getContext(), "Not Deleted", Toast.LENGTH_SHORT).show();
-                }
+                // Show alertDialog to delete
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage("Want to delete " + holder.textView_name.getText().toString() + "?");
+                builder.setNegativeButton("No", null);
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                /**
-                 * Remove item from list after delete from db
-                 */
-                int newPosition = holder.getAdapterPosition();
-                Log.d("touhid","on Click onBindViewHolder");
-                dataEntityList.remove(newPosition);
-                notifyItemRemoved(newPosition);
-                notifyItemRangeChanged(newPosition, dataEntityList.size());
+                        /**
+                         * Delete item from db
+                         */
+                        DataService dataService = new DataService(view.getContext());
+                        long deleteStatus = dataService.deleteParticipantData(holder.textView_name.getTag().toString());
+                        if (deleteStatus > 0) {
+                            Toast.makeText(view.getContext(), "Delete Success", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(view.getContext(), "Not Deleted", Toast.LENGTH_SHORT).show();
+                        }
 
-                /**
-                 * Change Total participant after delete item
-                 */
-                ParticipantList participantList = new ParticipantList();
-                participantList.getAndShowParticipantAmount((Activity) context);
+                        /**
+                         * Remove item from list after delete from db
+                         */
+                        int newPosition = holder.getAdapterPosition();
+                        Log.d("touhid", "on Click onBindViewHolder");
+                        dataEntityList.remove(newPosition);
+                        notifyItemRemoved(newPosition);
+                        notifyItemRangeChanged(newPosition, dataEntityList.size());
+
+                        /**
+                         * Change Total participant after delete item
+                         */
+                        ParticipantList participantList = new ParticipantList();
+                        participantList.getAndShowParticipantAmount((Activity) context);
+
+                    }
+                });
+                builder.create();
+                builder.show();
 
 
             }
@@ -149,7 +164,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ParticipantViewHol
         notifyDataSetChanged();
 
     }
-
 
 
 }

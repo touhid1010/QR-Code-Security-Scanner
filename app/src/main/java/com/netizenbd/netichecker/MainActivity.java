@@ -2,10 +2,8 @@ package com.netizenbd.netichecker;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -48,8 +46,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, SMS.OnFragmentInteractionListener {
 
@@ -69,6 +65,7 @@ public class MainActivity extends AppCompatActivity
     SharedPreferences preferences;
     String smsText;
     boolean checkbox_sms;
+    MediaPlayer mPlayerSuccess, mediaPlayerError;
 
 
     @Override
@@ -78,6 +75,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Neti QR Checker");
+
 
         // fab
         fab_reset = (FloatingActionButton) findViewById(R.id.fab_reset);
@@ -105,6 +103,10 @@ public class MainActivity extends AppCompatActivity
             smsText = preferences.getString(SMS.PREFERENCE_SMS_KEY_SMS_TEXT, "");
             checkbox_sms = preferences.getBoolean(SMS.PREFERENCE_SMS_KEY_CHECKBOX, false);
         }
+
+        // Media player to play success sound
+        mPlayerSuccess = MediaPlayer.create(this, R.raw.successsound);
+        mediaPlayerError = MediaPlayer.create(this, R.raw.errorsound);
 
 
         // sms
@@ -180,6 +182,7 @@ public class MainActivity extends AppCompatActivity
                                 // This part will run again and again while reading same qr
 
                             } else {
+
                                 // This part will run one time while reading same qr
 
                                 String allData = "";
@@ -198,12 +201,22 @@ public class MainActivity extends AppCompatActivity
                                 } catch (JSONException e) {
                                     allData = sQrData;
                                     Toast.makeText(MainActivity.this, "QR Not Valid! - (Show Part)", Toast.LENGTH_SHORT).show();
+                                    /**
+                                     * Play a save error sound
+                                     */
+                                    if (mediaPlayerError != null) {
+                                        mediaPlayerError.start();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+                                    }
+
                                     e.printStackTrace();
                                 }
 
 //                                textView_showInfo.setText(barcodes.valueAt(0).displayValue); // Update the TextView
                                 textView_showInfo.setText(allData); // Update the TextView
                                 saveToSqlite(sQrData); // Save to db
+
 
                             }
                             // Keep qr data in a string to check data are same or not
@@ -259,6 +272,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             frameLayout_forFragment.removeAllViews();
             fab_reset.setVisibility(View.VISIBLE);
+            // remove all fragment from backStack
+            FragmentManager fm = this.getSupportFragmentManager();
+            fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE); // null is null fragment, alternative is fragment name
         } else if (id == R.id.nav_participant_list) {
             startActivity(new Intent(this, ParticipantList.class));
         } else if (id == R.id.nav_sms) {
@@ -282,6 +298,7 @@ public class MainActivity extends AppCompatActivity
                 tempQrData = "";
                 textView_showInfo.setText("Reading QR ...");
                 Toast.makeText(this, "Reset", Toast.LENGTH_SHORT).show();
+
                 break;
 
 
@@ -357,10 +374,26 @@ public class MainActivity extends AppCompatActivity
                 mySendSMS.sendMySMS(pPhone, smsBody);
             }
 
+            /**
+             * Play a save success sound
+             */
+            if (mPlayerSuccess != null) {
+                mPlayerSuccess.start();
+            } else {
+                Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+            }
+
         } else {
             Toast.makeText(this, "Not Saved", Toast.LENGTH_SHORT).show();
+            /**
+             * Play a save error sound
+             */
+            if (mediaPlayerError != null) {
+                mediaPlayerError.start();
+            } else {
+                Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+            }
         }
-
     }
 
     @Override
@@ -368,5 +401,18 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+        if (mPlayerSuccess != null) {
+            mPlayerSuccess.stop();
+            mPlayerSuccess.release();
+        }
+        if (mediaPlayerError != null) {
+            mediaPlayerError.stop();
+            mediaPlayerError.release();
+        }
+
+    }
 }
