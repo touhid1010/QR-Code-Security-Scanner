@@ -5,5 +5,5 @@ package com.netizenbd.netichecker;
  */
 
 public class CommonNames {
-    public static boolean deleteNotify;
+    public static final String PREFERENCE_KEY_SOUND_ON_OFF = "pref_key_sound_on_off";
 }

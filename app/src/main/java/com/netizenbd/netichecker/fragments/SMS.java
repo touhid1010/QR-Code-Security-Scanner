@@ -34,7 +34,7 @@ public class SMS extends Fragment implements View.OnClickListener {
     EditText editText_SMSText;
     CheckBox checkbox_sendSMS;
     Button button_smsSave;
-    public static final String PREFERENCE_NAME_SMS = "smsPref";
+    public static final String PREFERENCE_NAME_SETTINGS = "settingsPref";
     public static final String PREFERENCE_SMS_KEY_SMS_TEXT = "smstext";
     public static final String PREFERENCE_SMS_KEY_CHECKBOX = "check";
     boolean b;
@@ -93,7 +93,7 @@ public class SMS extends Fragment implements View.OnClickListener {
         button_smsSave.setOnClickListener(this);
 
         // Shared pref
-        preferences = this.getActivity().getSharedPreferences(PREFERENCE_NAME_SMS, Context.MODE_PRIVATE);
+        preferences = this.getActivity().getSharedPreferences(PREFERENCE_NAME_SETTINGS, Context.MODE_PRIVATE);
         if (preferences != null) {
             editText_SMSText.setText(preferences.getString(PREFERENCE_SMS_KEY_SMS_TEXT, ""));
             checkbox_sendSMS.setChecked(preferences.getBoolean(PREFERENCE_SMS_KEY_CHECKBOX, false));

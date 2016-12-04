@@ -2,6 +2,7 @@ package com.netizenbd.netichecker;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, SMS.OnFragmentInteractionListener {
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity
     FragmentTransaction transaction;
     SharedPreferences preferences;
     String smsText;
-    boolean checkbox_sms;
+    boolean checkbox_sms, checkMenuSoundOnOff = true;
     MediaPlayer mPlayerSuccess, mediaPlayerError;
     boolean doubleBackToExitPressedOnce = false;
 
@@ -77,7 +79,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Neti QR Checker");
-
 
         // fab
         fab_reset = (FloatingActionButton) findViewById(R.id.fab_reset);
@@ -93,23 +94,23 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // initialization
+        // Initialization
         frameLayout_forFragment = (FrameLayout) findViewById(R.id.frameLayout_forFragment);
 
         // Fragment
         manager = getSupportFragmentManager();
 
-        // Shared pref
-        preferences = getSharedPreferences(SMS.PREFERENCE_NAME_SMS, Context.MODE_PRIVATE);
+        // Shared pref for sms settings and sound settings
+        preferences = getSharedPreferences(SMS.PREFERENCE_NAME_SETTINGS, Context.MODE_PRIVATE);
         if (preferences != null) {
             smsText = preferences.getString(SMS.PREFERENCE_SMS_KEY_SMS_TEXT, "");
             checkbox_sms = preferences.getBoolean(SMS.PREFERENCE_SMS_KEY_CHECKBOX, false);
+            checkMenuSoundOnOff = preferences.getBoolean(CommonNames.PREFERENCE_KEY_SOUND_ON_OFF, true);
         }
 
         // Media player to play success sound
         mPlayerSuccess = MediaPlayer.create(this, R.raw.successsound);
         mediaPlayerError = MediaPlayer.create(this, R.raw.errorsound);
-
 
         // sms
         mySendSMS = new MySendSMS(this);
@@ -206,10 +207,12 @@ public class MainActivity extends AppCompatActivity
                                     /**
                                      * Play a save error sound
                                      */
-                                    if (mediaPlayerError != null) {
-                                        mediaPlayerError.start();
-                                    } else {
-                                        Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+                                    if (checkMenuSoundOnOff) {
+                                        if (mediaPlayerError != null) {
+                                            mediaPlayerError.start();
+                                        } else {
+                                            Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
 
                                     e.printStackTrace();
@@ -237,6 +240,17 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+
+        } else if (getSupportFragmentManager().popBackStackImmediate()) { // if any fragment on backStack
+            // Remove all fragment from backStack
+            FragmentManager fm = this.getSupportFragmentManager();
+            fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE); // null is null fragment, alternative is fragment name
+
+            // show fab after removing all fragment
+            frameLayout_forFragment.removeAllViews();
+            fab_reset.setVisibility(View.VISIBLE);
+
+
         } else {
             /**
              * Double back press to exit
@@ -267,6 +281,18 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        // Set checked menu default sound on; while creating menu
+        if (checkMenuSoundOnOff) { // getting value from shared pref
+            menu.findItem(R.id.action_soundOnOff).setChecked(true);
+        } else {
+            menu.findItem(R.id.action_soundOnOff).setChecked(false);
+        }
+
+
+
+
+
         return true;
     }
 
@@ -278,7 +304,27 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_soundOnOff) {
+
+            if (item.isChecked()) {
+                item.setChecked(false);
+                checkMenuSoundOnOff = false;
+                // Set setting to shared pref
+                Editor editor = preferences.edit();
+                editor.putBoolean(CommonNames.PREFERENCE_KEY_SOUND_ON_OFF, checkMenuSoundOnOff);
+                editor.apply();
+                Toast.makeText(this, "Sound Off", Toast.LENGTH_SHORT).show();
+            } else {
+                item.setChecked(true);
+                checkMenuSoundOnOff = true;
+                // Set setting to shared pref
+                Editor editor = preferences.edit();
+                editor.putBoolean(CommonNames.PREFERENCE_KEY_SOUND_ON_OFF, checkMenuSoundOnOff);
+                editor.apply();
+                Toast.makeText(this, "Sound On", Toast.LENGTH_SHORT).show();
+            }
+
+
             return true;
         }
 
@@ -292,8 +338,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            frameLayout_forFragment.removeAllViews();
             fab_reset.setVisibility(View.VISIBLE);
+            // remove all fragment
+            frameLayout_forFragment.removeAllViews();
             // remove all fragment from backStack
             FragmentManager fm = this.getSupportFragmentManager();
             fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE); // null is null fragment, alternative is fragment name
@@ -380,7 +427,7 @@ public class MainActivity extends AppCompatActivity
             ));
 
         } catch (JSONException e) {
-            Toast.makeText(this, "QR Not Valid! - (Save Part)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "QR Not Valid to save", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
 
@@ -398,22 +445,28 @@ public class MainActivity extends AppCompatActivity
             /**
              * Play a save success sound
              */
-            if (mPlayerSuccess != null) {
-                mPlayerSuccess.start();
-            } else {
-                Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+            if (checkMenuSoundOnOff) {
+                if (mPlayerSuccess != null) {
+                    mPlayerSuccess.start();
+                } else {
+                    Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+                }
             }
+
 
         } else {
             Toast.makeText(this, "Not Saved", Toast.LENGTH_SHORT).show();
             /**
              * Play a save error sound
              */
-            if (mediaPlayerError != null) {
-                mediaPlayerError.start();
-            } else {
-                Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+            if (checkMenuSoundOnOff) {
+                if (mediaPlayerError != null) {
+                    mediaPlayerError.start();
+                } else {
+                    Toast.makeText(MainActivity.this, "Sound Off", Toast.LENGTH_SHORT).show();
+                }
             }
+
         }
     }
 
